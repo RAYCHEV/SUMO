@@ -1,0 +1,73 @@
+Sumo robotics software
+
+The project is based on Raspberry Pi platfrom.
+
+Original remote is:
+origin	https://github.com/raspberrypi/linux (fetch)
+origin	https://github.com/raspberrypi/linux (push)
+
+Kernel build instructions:
+
+# 1. Install tools:
+sudo apt-get autoremove
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install git bc bison flex libssl-dev make gcc android-tools-mkbootimg adb fastboot smbclient libncurses5-dev
+
+# 2. Install compiler:
+
+# Generate SSH key:
+# ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+# Post public key to GitHub
+# cat ssh-add ~/.ssh/id_rsa.pub
+# echo "eval \"\$(ssh-agent -s)\"" >> ~/.bashrc
+# echo "ssh-add ~/.ssh/id_rsa" >> ~/.bashrc
+# source ~/.bashrc
+# git clone git@github.com:RAYCHEV/SUMO-kernel.git -b rpi_tools ~/rpi_tools
+
+git clone git@github.com:RAYCHEV/SUMO-kernel.git -b rpi_tools ~/rpi_tools
+sudo mkdir -p /opt/arm_compilers
+sudo mv ~/rpi_tools /opt/arm_compilers/rpi_tools
+
+# 3. Export variables:
+echo "# Export Path to Raspberry Pi Cross Compiler" >> ~/.bashrc
+echo "export PATH=/opt/arm_compilers/rpi_tools/arm-bcm2708/arm-linux-gnueabihf/bin:\$PATH" >> ~/.bashrc
+
+# 4. Clone kernel source:
+# git clone https://github.com/RAYCHEV/SUMO-kernel.git -b rpi_kernel_v4.19.118_dev SUMO-kernel
+git clone git@github.com:RAYCHEV/SUMO-kernel.git -b rpi_kernel_v4.19.118_dev SUMO-kernel
+cd SUMO-kernel
+
+# !!! IMPORTANT !!! If you already cloned repo just use:
+# git fetch origin
+# mv .git/ ../
+# rm -rf * && rm -rf .*
+# mv ../.git/ .
+# git branch -av
+# git checkout remotes/origin/rpi_kernel_v4.19.118_dev -B rpi_kernel_v4.19.118_dev
+
+# 5. Build kernel 4.19.118 and prepare output files:
+export KERNEL=kernel7
+
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcm2709_defconfig
+time make -j8 ARCH=arm CROSS_COMPILE="arm-linux-gnueabihf-" zImage modules dtbs
+mkdir -p ../out/ && mkdir -p ../out/boot/overlays/
+sudo make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_MOD_PATH=../out/ modules_install
+sudo cp arch/arm/boot/dts/*.dtb ../out/boot/
+sudo cp arch/arm/boot/dts/overlays/*.dtb* ../out/boot/overlays/
+sudo cp arch/arm/boot/dts/overlays/README ../out/boot/overlays/
+sudo cp arch/arm/boot/zImage ../out/boot/kernel7.img
+
+# 6. Clean kernel:
+make clean
+make mrproper
+
+# 7. Copy output files to sdcard:
+sudo mkdir -p /media/pupinov/boot/backup
+sudo mv /media/pupinov/boot /media/pupinov/boot/backup
+sudo cp -r ../out/boot/* /media/pupinov/boot
+
+sudo mv /media/pupinov/rootfs/lib/modules/4.19.118-v7+/ /media/pupinov/rootfs/lib/modules/4.19.118-v7+_backup
+sudo mv ../out/lib/modules/4.19.118-v7+/ /media/pupinov/rootfs/lib/modules/4.19.118-v7+/
+sudo rm /media/pupinov/rootfs/lib/modules/4.19.118-v7+/build
+sudo rm /media/pupinov/rootfs/lib/modules/4.19.118-v7+/source
