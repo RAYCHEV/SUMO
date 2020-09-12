@@ -12,6 +12,7 @@
 #include <linux/cdev.h>    /* Needed for character devices */
 #include <linux/fs.h>      /* Needed for file operations */
 #include <linux/uaccess.h> /* Needed for user access to kernel */
+#include <uapi/leds/leds-custom-interface.h> /* Needed for userspace interface */
 
 #define	GPIO26	26
 #define FIRST_MINOR 0
@@ -20,6 +21,7 @@
 static dev_t dev;
 static struct cdev c_dev;
 static struct class *cl;
+static int status = 10;
 
 enum {
 	SET_OFF	=	0,
@@ -55,13 +57,34 @@ static int leds_write(struct file *f, const char __user *buf, size_t len, loff_t
     return len;
 }
 
+static long leds_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+{
+    int rc = 0;
+    query_arg_t q;
+
+    switch (cmd) {
+      case QUERY_SET_VARIABLES:
+        if (copy_from_user(&q, (query_arg_t *)arg, sizeof(query_arg_t))) {
+            return -EACCES;
+        }
+        status = q.status;
+        gpio_set_value(GPIO26, status);
+        break;
+      default:
+        return -EINVAL;
+    }
+    printk(KERN_INFO "Kernel module driver: leds custom ioctl.\n");
+    return rc;
+}
+
 static struct file_operations leds_custom_fops =
 {
     .owner = THIS_MODULE,
     .open = leds_open,
     .release = leds_close,
     .read = leds_read,
-    .write = leds_write
+    .write = leds_write,
+    .unlocked_ioctl = leds_ioctl
 };
 
 static void subscribe_gpios(void) {
