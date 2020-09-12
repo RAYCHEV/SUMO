@@ -43,13 +43,25 @@ static int leds_close(struct inode *i, struct file *f)
     return 0;
 }
 
+static ssize_t leds_read(struct file *f, char __user *buf, size_t len, loff_t *off)
+{
+    printk(KERN_INFO "Kernel module driver: leds custom read.\n");
+    return 0;
+}
+
+static int leds_write(struct file *f, const char __user *buf, size_t len, loff_t *off)
+{
+    printk(KERN_INFO "Kernel module driver: leds custom write.\n");
+    return len;
+}
+
 static struct file_operations leds_custom_fops =
 {
     .owner = THIS_MODULE,
     .open = leds_open,
     .release = leds_close,
-    .read = NULL,
-    .write = NULL
+    .read = leds_read,
+    .write = leds_write
 };
 
 static void subscribe_gpios(void) {
