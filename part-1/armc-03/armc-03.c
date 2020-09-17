@@ -56,7 +56,13 @@
 
 #elif defined( RPI3 )
 
-    #error The RPI3 has an ioexpander between the ACT LED and the GPU and so cannot be used in this tutorial
+    /* RPi 3B: Enable blink led on GPIO26 and comment error line.
+    #error The RPI3 has an ioexpander between the ACT LED and the GPU and so cannot be used in this tutorial */
+    #define LED_GPFSEL      GPIO_GPFSEL2
+    #define LED_GPFBIT      18
+    #define LED_GPSET       GPIO_GPSET0
+    #define LED_GPCLR       GPIO_GPCLR0
+    #define LED_GPIO_BIT    26
 
 #elif defined( RPI4 )
     /* The RPi4 model has the ACT LED attached to GPIO 42
