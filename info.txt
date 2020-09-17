@@ -1,0 +1,3 @@
+Original remote is:
+origin	https://github.com/BrianSidebotham/arm-tutorial-rpi.git (fetch)
+origin	https://github.com/BrianSidebotham/arm-tutorial-rpi.git (push)
