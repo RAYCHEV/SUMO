@@ -97,4 +97,4 @@ obj-$(CONFIG_LEDS_USER)			+= uleds.o
 obj-$(CONFIG_LEDS_TRIGGERS)		+= trigger/
 
 # LED Custom
-obj-m					+= leds-custom.o
+obj-$(CONFIG_LEDS_CUSTOM)		+= leds-custom.o

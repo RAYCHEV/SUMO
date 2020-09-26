@@ -823,6 +823,13 @@ config LEDS_LM36274
 	  Say Y to enable the LM36274 LED driver for TI LMU devices.
 	  This supports the LED device LM36274.
 
+config LEDS_CUSTOM
+	tristate "LEDS custom driver"
+	help
+	  Say Y to enable the LEDS custom driver as build-in.
+	  Say M to enable the LEDS custom driver as module.
+	  This supports the LED custom driver.
+
 comment "LED Triggers"
 source "drivers/leds/trigger/Kconfig"
 
