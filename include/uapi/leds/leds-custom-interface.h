@@ -14,5 +14,6 @@ typedef struct {
 } query_arg_t;
 
 #define QUERY_SET_VARIABLES _IOW('q', 1, query_arg_t *)
+#define QUERY_GET_VARIABLES _IOR('q', 2, query_arg_t *)
 
 #endif /* _LEDS_CUSTOM_INTERFACE_ */

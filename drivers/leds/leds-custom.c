@@ -63,15 +63,25 @@ static long leds_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
     query_arg_t q;
 
     switch (cmd) {
-      case QUERY_SET_VARIABLES:
+      case QUERY_GET_VARIABLES: {
+        status = gpio_get_value(GPIO26);
+        q.status = status;
+        if (copy_to_user((query_arg_t *)arg, &q, sizeof(query_arg_t))) {
+            return -EACCES;
+        }
+        break;
+      }
+      case QUERY_SET_VARIABLES: {
         if (copy_from_user(&q, (query_arg_t *)arg, sizeof(query_arg_t))) {
             return -EACCES;
         }
         status = q.status;
         gpio_set_value(GPIO26, status);
         break;
-      default:
+      }
+      default: {
         return -EINVAL;
+      }
     }
     printk(KERN_INFO "Kernel module driver: leds custom ioctl.\n");
     return rc;
