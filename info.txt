@@ -61,6 +61,8 @@ sudo cp arch/arm/boot/dts/overlays/*.dtb* ../out/boot/overlays/
 sudo cp arch/arm/boot/dts/overlays/README ../out/boot/overlays/
 sudo cp arch/arm/boot/zImage ../out/boot/kernel7.img
 
+make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- INSTALL_HDR_PATH=../usr headers_install
+
 # 6. Clean kernel:
 make clean
 make mrproper
